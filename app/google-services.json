@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "898281598321",
+    "project_id": "connex-1ec7d",
+    "storage_bucket": "connex-1ec7d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:898281598321:android:246c004c86faa7ca8a9ad0",
+        "android_client_info": {
+          "package_name": "com.example.connex_jetpack"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "898281598321-7dtd6vvd096d46riqtk0cvaudat1huhc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.connex_jetpack",
+            "certificate_hash": "46ed80ede13d1784810511b652fbf6184126aa94"
+          }
+        },
+        {
+          "client_id": "898281598321-shlkustg8ntdvns7286p9in86rjibk11.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQqytlRJKksfg2aT0aRn5l6QBCS3Jnzdk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "898281598321-shlkustg8ntdvns7286p9in86rjibk11.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
