@@ -22,6 +22,7 @@ fun NavGraph(navController: NavHostController) {
         composable("cards_empresa") { TrabajadorCardScreen(navController) }
         composable("crear_oferta") { CrearOferta(navController) }
         composable("oferta_publicada") { OfertaPublicadaScreen(navController) }
+        composable("registro_completado") { RegistroCompletadoScreen(navController)}
         composable("filtros_trabajador") { FiltrosTrabajadorScreen(navController) }
         composable("filtros_empresa") { FiltrosEmpresaScreen(navController) }
 

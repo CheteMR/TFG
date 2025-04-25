@@ -230,7 +230,7 @@ fun RegisterEmpresaScreen(navController: NavController) {
                                         .set(empresaData)
                                         .addOnSuccessListener {
                                             Toast.makeText(context, "Registro completado", Toast.LENGTH_SHORT).show()
-                                            navController.navigate("profile")
+                                            navController.navigate("registro_completado")
                                         }
                                         .addOnFailureListener { e ->
                                             Toast.makeText(context, "Error al guardar en Firestore: ${e.message}", Toast.LENGTH_LONG).show()

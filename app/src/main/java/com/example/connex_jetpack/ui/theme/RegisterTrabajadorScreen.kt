@@ -408,7 +408,7 @@ fun RegisterTrabajadorScreen(navController: NavController) {
                                         .set(trabajadorData)
                                         .addOnSuccessListener {
                                             Toast.makeText(context, "Registro completado", Toast.LENGTH_SHORT).show()
-                                            navController.navigate("profiletrabajador")
+                                            navController.navigate("registro_completado")
                                         }
                                         .addOnFailureListener { e ->
                                             Toast.makeText(context, "Error al guardar en Firestore: ${e.message}", Toast.LENGTH_LONG).show()
