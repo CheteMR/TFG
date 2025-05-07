@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.connex_jetpack.R
 
-                //CARD DONDE SE VE AL TRABAJADOR (SOLO DEBE VERLAS LAS EMPRESAS)
+//CARD DONDE SE VE AL TRABAJADOR (SOLO DEBE VERLAS LAS EMPRESAS)
 @Composable
 fun TrabajadorCard(
     fotoTrabajador: Int,
@@ -29,76 +29,85 @@ fun TrabajadorCard(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF4E8ADB)) // Fondo azul de la app
+            .background(Color(0xFF4E8ADB))
             .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
+        verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Card(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(600.dp) // Altura ajustada
-                .padding(10.dp)
-                .shadow(8.dp, RoundedCornerShape(20.dp)),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+                .weight(1f) // ocupa espacio disponible sin desbordar
         ) {
-            Column(
+            val maxCardHeight = maxHeight * 0.9f
+
+            Card(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.SpaceBetween
+                    .fillMaxWidth()
+                    .heightIn(max = maxCardHeight)
+                    .padding(10.dp)
+                    .shadow(8.dp, RoundedCornerShape(20.dp)),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
-                Image(
-                    painter = painterResource(id = fotoTrabajador),
-                    contentDescription = "Foto del trabajador",
+                Column(
                     modifier = Modifier
-                        .height(300.dp)
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                )
-
-                Column(modifier = Modifier.padding(top = 8.dp)) {
-                    Text(
-                        text = profesion,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1B396A)
-                    )
-
-                    Text(
-                        text = "A $distanciaKm de ti",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier.fillMaxWidth()
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Button(
-                        onClick = onNope,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE57373)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Nope", color = Color.White)
+                    Image(
+                        painter = painterResource(id = fotoTrabajador),
+                        contentDescription = "Foto del trabajador",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1.5f) // más flexible que height fija
+                            .clip(RoundedCornerShape(16.dp))
+                    )
+
+                    Column(modifier = Modifier.padding(top = 8.dp)) {
+                        Text(
+                            text = profesion,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1B396A)
+                        )
+                        Text(
+                            text = "A $distanciaKm de ti",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Gray
+                        )
                     }
 
-                    Button(
-                        onClick = onVerMas,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE0E0E0)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Ver más", color = Color.Black)
-                    }
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                    Button(
-                        onClick = onLike,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF81C784)),
-                        shape = RoundedCornerShape(12.dp)
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Like", color = Color.White)
+                        Button(
+                            onClick = onNope,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE57373)),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text("Nope", color = Color.White)
+                        }
+
+                        Button(
+                            onClick = onVerMas,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE0E0E0)),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text("Ver más", color = Color.Black)
+                        }
+
+                        Button(
+                            onClick = onLike,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF81C784)),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text("Like", color = Color.White)
+                        }
                     }
                 }
             }

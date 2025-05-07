@@ -18,7 +18,6 @@ import com.example.connex_jetpack.R
 import com.airbnb.lottie.compose.*
 
 
-
 @Composable
 fun OfertaPublicadaScreen(navController: NavController) {
 

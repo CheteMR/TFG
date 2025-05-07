@@ -15,7 +15,6 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -69,19 +68,22 @@ fun LoginScreen(navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF4E8ADB))
+            .imePadding()
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Logo de la APP",
+                painter = painterResource(id = R.drawable.logo2),
+                contentDescription = "Logo de Connex",
                 modifier = Modifier
-                    .size(400.dp)
-                    .padding(top = 10.dp)
+                    .fillMaxWidth(0.9f) // 90% del ancho de pantalla
+                    .aspectRatio(1f)    // lo mantiene cuadrado
+                    .sizeIn(maxWidth = 360.dp) // no pasa de 360dp para que no se rompa
             )
 
             val fuenteTextos = FontFamily(Font(R.font.sairastencilone))
@@ -98,20 +100,18 @@ fun LoginScreen(navController: NavController) {
                 )
             )
 
-            Text("SWIPE.", style = estiloTexto,
-                modifier = Modifier.padding(top = 2.dp)
-            )
+            Text("SWIPE.", style = estiloTexto)
             Text("MATCH.", style = estiloTexto)
             Text("WORK.", style = estiloTexto)
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             OutlinedTextField(
                 value = emailManual,
                 onValueChange = { emailManual = it },
                 label = { Text("Correo electrónico") },
                 singleLine = true,
-                textStyle = TextStyle(color = Color.Black), // 👈 Aquí el color del texto
+                textStyle = TextStyle(color = Color.Black),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     containerColor = Color.LightGray,
                     focusedBorderColor = Color.Black,
@@ -120,10 +120,10 @@ fun LoginScreen(navController: NavController) {
                     focusedLabelColor = Color.Black,
                     unfocusedLabelColor = Color.Black
                 ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = passwordManual,
@@ -140,12 +140,10 @@ fun LoginScreen(navController: NavController) {
                     focusedLabelColor = Color.Black,
                     unfocusedLabelColor = Color.Black
                 ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Button(
                 onClick = {
@@ -159,13 +157,13 @@ fun LoginScreen(navController: NavController) {
                                 db.collection("trabajadores").document(uid).get()
                                     .addOnSuccessListener { docTrabajador ->
                                         if (docTrabajador.exists()) {
-                                            isEmpresaGlobal.value = false //CONFIRMAMOS QUE NO ES EMPRESA
+                                            isEmpresaGlobal.value = false
                                             navController.navigate("cards_trabajador")
                                         } else {
                                             db.collection("empresas").document(uid).get()
                                                 .addOnSuccessListener { docEmpresa ->
                                                     if (docEmpresa.exists()) {
-                                                        isEmpresaGlobal.value = true //CONFIRMAMOS QUE SI QUE ES EMPRESA
+                                                        isEmpresaGlobal.value = true
                                                         navController.navigate("cards_empresa")
                                                     } else {
                                                         Toast.makeText(context, "Tipo de usuario no encontrado", Toast.LENGTH_SHORT).show()
@@ -186,18 +184,19 @@ fun LoginScreen(navController: NavController) {
                         }
                 },
                 modifier = Modifier
-                    .width(240.dp)
-                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
                     .height(50.dp)
                     .shadow(6.dp, RoundedCornerShape(12.dp)),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1B396A), // azul profundo
+                    containerColor = Color(0xFF1B396A),
                     contentColor = Color.White
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text("Iniciar sesión")
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             BotonLogeoGoogle {
                 val signInRequest = googleAuthUiClient.getSignInRequest()
@@ -218,13 +217,14 @@ fun LoginScreen(navController: NavController) {
                 Log.d("LinkedInSignIn", "Botón de LinkedIn presionado")
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
+
             Text(
                 text = "¿No estás registrado aún?",
                 fontSize = 14.sp,
                 color = Color.White,
                 textDecoration = TextDecoration.Underline,
                 modifier = Modifier
-                    .padding(top = 6.dp)
                     .clickable {
                         navController.navigate("registro")
                     }
@@ -238,8 +238,8 @@ fun BotonLogeoGoogle(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier
-            .width(350.dp)
-            .padding(16.dp)
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
             .height(50.dp)
             .shadow(8.dp, shape = RoundedCornerShape(8.dp)),
         colors = ButtonDefaults.buttonColors(
@@ -274,12 +274,12 @@ fun BotonLoginLinkedIn(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier
-            .width(350.dp)
-            .padding(16.dp)
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
             .height(50.dp)
             .shadow(8.dp, shape = RoundedCornerShape(8.dp)),
         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0077B5)),
-        shape = MaterialTheme.shapes.medium
+        shape = RoundedCornerShape(8.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -289,7 +289,7 @@ fun BotonLoginLinkedIn(onClick: () -> Unit) {
             Image(
                 painter = painterResource(id = R.drawable.linkedin_icon),
                 contentDescription = "LinkedIn Logo",
-                modifier = Modifier.size(34.dp)
+                modifier = Modifier.size(32.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(

@@ -10,8 +10,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Menu
@@ -45,7 +48,8 @@ import androidx.compose.ui.text.style.TextAlign
 fun RegisterScreen(navController: NavController) {
     var selectedOption by remember { mutableStateOf("") }
     var menuExpanded by remember { mutableStateOf(false) }
-    val fuenteTextos = FontFamily(Font(R.font.sairastencilone)) // Fuente personalizada
+    val fuenteTextos = FontFamily(Font(R.font.sairastencilone))
+
     val estiloRotulo = TextStyle(
         fontSize = 50.sp,
         fontWeight = FontWeight.Bold,
@@ -54,11 +58,11 @@ fun RegisterScreen(navController: NavController) {
         fontFamily = fuenteTextos,
         shadow = Shadow(
             color = Color(0xFF252525),
-            offset = Offset(4f, 4f), //Desplazamiento X, Y
-            blurRadius = 8f //Cuánto se difumina
+            offset = Offset(4f, 4f),
+            blurRadius = 8f
         )
-
     )
+
     val estiloTexto = TextStyle(
         fontSize = 35.sp,
         fontWeight = FontWeight.Bold,
@@ -67,8 +71,8 @@ fun RegisterScreen(navController: NavController) {
         fontFamily = fuenteTextos,
         shadow = Shadow(
             color = Color(0xFF252525),
-            offset = Offset(4f, 4f), //Desplazamiento X, Y
-            blurRadius = 8f //Cuánto se difumina
+            offset = Offset(4f, 4f),
+            blurRadius = 8f
         )
     )
 
@@ -77,11 +81,15 @@ fun RegisterScreen(navController: NavController) {
             .fillMaxSize()
             .background(Color(0xFF4E8ADB))
             .padding(16.dp)
+            .imePadding() // 👉 se adapta si el teclado está abierto
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()), // 👉 Scroll habilitado
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // 🔹 HEADER CON MENÚ + LOGO + PERFIL
+            // 🔹 HEADER
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -89,79 +97,27 @@ fun RegisterScreen(navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Menú (hamburguesa)
-                Box {
-                    IconButton(onClick = { menuExpanded = true }) {
-                        Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = "Menú",
-                            tint = Color.White
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = menuExpanded,
-                        onDismissRequest = { menuExpanded = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text("Inicio") },
-                            onClick = {
-                                menuExpanded = false
-                                navController.navigate("home")
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Configuración") },
-                            onClick = {
-                                menuExpanded = false
-                                navController.navigate("settings")
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Cerrar Sesión") },
-                            onClick = {
-                                menuExpanded = false
-                                // Lógica logout
-                            }
-                        )
-                    }
-                }
 
-                // Logo centrado
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = "Logo de la APP",
-                    modifier = Modifier.size(150.dp)
-                )
-
-                // Icono de perfil
-                IconButton(onClick = { navController.navigate("edit_profile") }) {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = "Perfil",
-                        tint = Color.White
-                    )
-                }
+                Spacer(modifier = Modifier.height(20.dp))
             }
 
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // 🔹 Título centrado visualmente
+            // 🔹 TÍTULO
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp), // altura controlada para el centrado relativo
+                    .height(100.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = "Registro", style = estiloRotulo)
             }
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            Text(text = "Elige el tipo de Usuario", style = estiloTexto)
+            Text("Elige el tipo de Usuario", style = estiloTexto)
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Opción 1
+            // 🔹 RADIO EMPRESA
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(
                     selected = selectedOption == "Empresa/Empleador",
@@ -177,7 +133,7 @@ fun RegisterScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Opción 2
+            // 🔹 RADIO TRABAJADOR
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(
                     selected = selectedOption == "Trabajador",
@@ -193,6 +149,7 @@ fun RegisterScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(30.dp))
 
+            // 🔹 BOTÓN SIGUIENTE
             Button(
                 onClick = {
                     when (selectedOption) {
@@ -216,18 +173,16 @@ fun RegisterScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // 🔹 Botón Volver
+            // 🔹 BOTÓN VOLVER
             Button(
                 onClick = { navController.popBackStack() },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
             ) {
-                Text(
-                    text = "Volver",
-                    fontSize = 18.sp,
-                    color = Color.Black
-                )
+                Text("Volver", fontSize = 18.sp, color = Color.Black)
             }
+
+            Spacer(modifier = Modifier.height(12.dp))
         }
     }
 }

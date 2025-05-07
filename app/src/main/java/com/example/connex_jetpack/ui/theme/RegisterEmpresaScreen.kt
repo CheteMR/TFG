@@ -67,54 +67,17 @@ fun RegisterEmpresaScreen(navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF4E8ADB))
-    ) {
-        // 🔹 HEADER FIJO
-        Column {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Menú
-                Box {
-                    IconButton(onClick = { menuExpanded = true }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menú", tint = Color.White)
-                    }
-                    DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                        DropdownMenuItem(text = { Text("Inicio") }, onClick = {
-                            menuExpanded = false; navController.navigate("home")
-                        })
-                        DropdownMenuItem(text = { Text("Configuración") }, onClick = {
-                            menuExpanded = false; navController.navigate("settings")
-                        })
-                        DropdownMenuItem(text = { Text("Cerrar Sesión") }, onClick = {
-                            menuExpanded = false
-                        })
-                    }
-                }
-
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = "Logo",
-                    modifier = Modifier.size(150.dp)
-                )
-
-                IconButton(onClick = { navController.navigate("edit_profile") }) {
-                    Icon(Icons.Default.AccountCircle, contentDescription = "Perfil", tint = Color.White)
-                }
-            }
-        }
+            .imePadding()
+    )
 
         // 🔹 FORMULARIO SCROLLABLE
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 100.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
             Spacer(modifier = Modifier.height(20.dp))
 
             Box(
@@ -269,4 +232,4 @@ fun RegisterEmpresaScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(50.dp))
         }
     }
-}
+
