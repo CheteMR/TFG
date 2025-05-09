@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">ConneX_JetPack</string>
+    <string name="default_web_client_id">898281598321-shlkustg8ntdvns7286p9in86rjibk11.apps.googleusercontent.com</string>
+
+
 </resources>

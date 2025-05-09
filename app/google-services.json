@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "898281598321",
+    "firebase_url": "https://connex-1ec7d-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "connex-1ec7d",
     "storage_bucket": "connex-1ec7d.firebasestorage.app"
   },
@@ -19,6 +20,14 @@
           "android_info": {
             "package_name": "com.example.connex_jetpack",
             "certificate_hash": "46ed80ede13d1784810511b652fbf6184126aa94"
+          }
+        },
+        {
+          "client_id": "898281598321-q2e2lq9uejavnnl2714grrf079b2n7mi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.connex_jetpack",
+            "certificate_hash": "bb1515117a66ac0b8fb29d6cb89da81a3b3817e5"
           }
         },
         {

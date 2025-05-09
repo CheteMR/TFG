@@ -77,4 +77,10 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    //Google
+    implementation(libs.authGoogle) /*Iniciar sesión con Google*/
+
+    implementation(libs.ccp)/*Seleccionamos nuestro codigo telefonico*/
+
 }

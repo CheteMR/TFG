@@ -25,7 +25,7 @@ fun NavGraph(navController: NavHostController) {
         composable("registro_completado") { RegistroCompletadoScreen(navController)}
         composable("filtros_trabajador") { FiltrosTrabajadorScreen(navController) }
         composable("filtros_empresa") { FiltrosEmpresaScreen(navController) }
-
+        composable("login_telefono") { LoginTelefonoScreen(navController) }
         composable("cards_filtro_empresa/{idOferta}") { backStackEntry ->
             val idOferta = backStackEntry.arguments?.getString("idOferta")
             idOferta?.let {

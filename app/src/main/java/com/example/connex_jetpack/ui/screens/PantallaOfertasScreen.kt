@@ -2,6 +2,8 @@ package com.example.connex_jetpack.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -29,6 +31,9 @@ fun PantallaOfertasScreen(navController: NavController) {
     val uid = FirebaseAuth.getInstance().currentUser?.uid
     val listaOfertasFiltradas = remember { mutableStateListOf<Map<String, Any>>() }
     val filtrosUsuario = remember { mutableStateOf<Map<String, Any>?>(null) }
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
+
 
     LaunchedEffect(uid) {
         uid?.let {
@@ -88,6 +93,8 @@ fun PantallaOfertasScreen(navController: NavController) {
         }
     }
 
+
+
     Scaffold(
         bottomBar = { BottomBar(navController = navController, isEmpresa = false) }
     ) { innerPadding ->
@@ -98,6 +105,7 @@ fun PantallaOfertasScreen(navController: NavController) {
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
+
             if (listaOfertasFiltradas.isEmpty()) {
                 if (filtrosUsuario.value != null) {
                     // Ya cargó pero no hay ofertas que cumplan los filtros
@@ -128,4 +136,7 @@ fun PantallaOfertasScreen(navController: NavController) {
         }
     }
 }
+
+
+
 

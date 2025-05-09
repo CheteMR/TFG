@@ -22,6 +22,9 @@ import androidx.compose.ui.unit.dp
 import com.example.connex_jetpack.R
 import kotlinx.coroutines.launch
 
+
+
+
                 //CARD DONDE SE VE LA OFERTA DE LA EMPRESA (SOLO DEBEN VERLA LOS TRABAJADORES)
                 @Composable
                 fun OfertaCard(
@@ -174,7 +177,12 @@ import kotlinx.coroutines.launch
                             }
                         }
                     }
+
                 }
+
+
+
+
 
 @Composable
 fun ActionButton(icon: Int, color: Color, scale: Float, onClick: () -> Unit) {

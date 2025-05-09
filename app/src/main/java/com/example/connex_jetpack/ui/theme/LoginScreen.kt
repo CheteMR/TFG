@@ -1,6 +1,8 @@
 package com.example.connex_jetpack.ui.theme
 
 import android.app.Activity
+import android.provider.Settings.Global.getString
+import android.provider.Settings.Secure.getString
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.ripple.rememberRipple
@@ -35,16 +38,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.getString
+import androidx.core.content.res.TypedArrayUtils.getString
 import androidx.navigation.NavController
 import com.example.connex_jetpack.R
 import com.example.connex_jetpack.auth.GoogleAuthUiClient
 import com.example.connex_jetpack.utils.isEmpresaGlobal
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController) {
+
     val context = LocalContext.current
     val activity = context as Activity
     val googleAuthUiClient = remember { GoogleAuthUiClient(context) }
@@ -54,19 +65,53 @@ fun LoginScreen(navController: NavController) {
         if (result.resultCode == Activity.RESULT_OK) {
             val intent = result.data
             if (intent != null) {
-                googleAuthUiClient.signInWithIntent(intent) { success ->
-                    if (success) {
-                        navController.navigate("profile")
+                googleAuthUiClient.signInWithIntent(intent) { success, user ->
+                    if (success && user != null) {
+                        val uid = user.uid
+                        val db = FirebaseFirestore.getInstance()
+
+                        db.collection("trabajadores").document(uid).get()
+                            .addOnSuccessListener { docTrabajador ->
+                                if (docTrabajador.exists()) {
+                                    isEmpresaGlobal.value = false
+                                    navController.navigate("cards_trabajador") {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                } else {
+                                    db.collection("empresas").document(uid).get()
+                                        .addOnSuccessListener { docEmpresa ->
+                                            if (docEmpresa.exists()) {
+                                                isEmpresaGlobal.value = true
+                                                navController.navigate("cards_empresa") {
+                                                    popUpTo("login") { inclusive = true }
+                                                }
+                                            } else {
+                                                Toast.makeText(context, "Usuario nuevo, por favor completa tu registro", Toast.LENGTH_SHORT).show()
+                                                navController.navigate("registro"){
+                                                    popUpTo("login") {inclusive = true}
+                                                }
+                                            }
+                                        }
+                                }
+                            }
                     } else {
-                        Log.e("Login", "Error al iniciar sesión con Google")
+                        Log.e("Login", "Inicio de sesión con Google falló en Firebase")
+                        Toast.makeText(context, "Error al autenticar con Firebase", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
+        } else {
+            Log.e("Login", "ResultCode != OK")
         }
     }
 
+
+
+
     var emailManual by remember { mutableStateOf("") }
     var passwordManual by remember { mutableStateOf("") }
+
+
 
     Box(
         modifier = Modifier
@@ -152,6 +197,7 @@ fun LoginScreen(navController: NavController) {
             var passwordManual by remember { mutableStateOf("") }
             var passwordVisible by remember { mutableStateOf(false) }
 
+
             OutlinedTextField(
                 value = passwordManual,
                 onValueChange = { passwordManual = it },
@@ -234,24 +280,33 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+
+
+
+
             BotonLogeoGoogle {
                 val signInRequest = googleAuthUiClient.getSignInRequest()
                 Identity.getSignInClient(context)
                     .beginSignIn(signInRequest)
                     .addOnSuccessListener { result ->
-                        launcher.launch(
+                        val intentSenderRequest =
                             IntentSenderRequest.Builder(result.pendingIntent.intentSender).build()
-                        )
+                        launcher.launch(intentSenderRequest)
+                            //IntentSenderRequest.Builder(result.pendingIntent.intentSender).build()
+                        //)
                     }
                     .addOnFailureListener { e ->
-                        Log.e("Login", "Fallo al iniciar SignIn: ${e.localizedMessage}")
-                        Toast.makeText(context, "Error al iniciar con Google", Toast.LENGTH_SHORT).show()
+                        Log.e("Login", "Google Sign-In falló", e)
+                        Toast.makeText(context, "Error al iniciar con Google: ${e.message}", Toast.LENGTH_LONG).show()
                     }
             }
 
-            BotonLoginLinkedIn {
-                Log.d("LinkedInSignIn", "Botón de LinkedIn presionado")
+            BotonLoginTelefono {
+                navController.navigate("login_telefono")
             }
+            //BotonLoginLinkedIn {
+              //  Log.d("LinkedInSignIn", "Botón de LinkedIn presionado")
+            //}
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -269,8 +324,12 @@ fun LoginScreen(navController: NavController) {
     }
 }
 
+
+
+
 @Composable
 fun BotonLogeoGoogle(onClick: () -> Unit) {
+
     Button(
         onClick = onClick,
         modifier = Modifier
@@ -305,6 +364,9 @@ fun BotonLogeoGoogle(onClick: () -> Unit) {
     }
 }
 
+
+
+/*
 @Composable
 fun BotonLoginLinkedIn(onClick: () -> Unit) {
     Button(
@@ -336,4 +398,33 @@ fun BotonLoginLinkedIn(onClick: () -> Unit) {
             )
         }
     }
+*/
+@Composable
+fun BotonLoginTelefono(onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .height(50.dp)
+            .shadow(8.dp, shape = RoundedCornerShape(8.dp)),
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(Icons.Default.Phone, contentDescription = "Teléfono", modifier = Modifier.size(24.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Continuar con teléfono",
+                fontSize = 16.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
 }
+

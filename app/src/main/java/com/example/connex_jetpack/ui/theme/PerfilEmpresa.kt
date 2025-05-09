@@ -7,24 +7,31 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.airbnb.lottie.compose.*
 import com.example.connex_jetpack.R
+import com.example.connex_jetpack.auth.GoogleAuthUiClient
 import com.example.connex_jetpack.ui.components.BottomBar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileEmpresa(navController: NavController) {
+    val context = LocalContext.current
     val uid = FirebaseAuth.getInstance().currentUser?.uid
     val db = FirebaseFirestore.getInstance()
+    val googleAuthUiClient = remember { GoogleAuthUiClient(context) }
+    val auth = FirebaseAuth.getInstance()
 
     var nombreEmpresa by remember { mutableStateOf<String?>(null) }
     var sector by remember { mutableStateOf<String?>("Tecnología") }
@@ -59,9 +66,32 @@ fun ProfileEmpresa(navController: NavController) {
     }
 
     Scaffold(
-        bottomBar = {
-            BottomBar(navController = navController, isEmpresa = true)
+        //bottomBar = {
+           // BottomBar(navController = navController, isEmpresa = true)
+        //},
+
+        //En el perfil se le pone un botón para cerrar sesión
+        topBar = {
+            TopAppBar(
+                title = { Text("Perfil Empresa") },
+                actions = {
+                    IconButton(onClick = {
+                        // 1) Firebase sign out
+                        auth.signOut()
+                        // 2) Google sign out
+                        googleAuthUiClient.signOut()
+                        // 3) Volver al login y limpiar backstack
+                        navController.navigate("login") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    }) {
+                        Icon(Icons.Default.ExitToApp, contentDescription = "Cerrar sesión")
+                    }
+                }
+            )
         },
+
+
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         if (nombreEmpresa == null) {

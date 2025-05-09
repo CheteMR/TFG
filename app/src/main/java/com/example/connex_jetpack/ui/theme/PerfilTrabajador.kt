@@ -1,7 +1,10 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.connex_jetpack.ui.theme
 
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -11,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,10 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.connex_jetpack.auth.GoogleAuthUiClient
 import com.example.connex_jetpack.ui.components.BottomBar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.firestore.SetOptions
 import java.util.*
 
 @Composable
@@ -35,6 +41,8 @@ fun ProfileTrabajador(navController: NavController) {
     val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
     val db = FirebaseFirestore.getInstance()
     val storage = FirebaseStorage.getInstance()
+    val googleAuthUiClient = remember { GoogleAuthUiClient(context) }
+    val auth = FirebaseAuth.getInstance()
 
     // Estados
     var nombre by remember { mutableStateOf("") }
@@ -85,9 +93,32 @@ fun ProfileTrabajador(navController: NavController) {
     }
 
     Scaffold(
-        bottomBar = {
-            BottomBar(navController = navController, isEmpresa = false)
-        }
+        //bottomBar = {
+           // BottomBar(navController = navController, isEmpresa = false)
+
+        //}
+
+        //En el perfil se le pone un botón para cerrar sesión
+                topBar = {
+            TopAppBar(
+                title = { Text("Perfil Trabajador") },
+                actions = {
+                    IconButton(onClick = {
+                        // 1) Firebase sign out
+                        auth.signOut()
+                        // 2) Google sign out
+                        googleAuthUiClient.signOut()
+                        // 3) Volver al login y limpiar backstack
+                        navController.navigate("login") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    }) {
+                        Icon(Icons.Default.ExitToApp, contentDescription = "Cerrar sesión")
+                    }
+                }
+            )
+        },
+
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -132,6 +163,8 @@ fun ProfileTrabajador(navController: NavController) {
                     )
                 }
             }
+
+
 
             // ✏️ Campos editables
             OutlinedTextField(
@@ -188,7 +221,12 @@ fun ProfileTrabajador(navController: NavController) {
             // 💾 Botón guardar cambios
             Button(
                 onClick = {
-                    db.collection("trabajadores").document(uid).update(
+                    db.collection("trabajadores").document(uid).set(
+                        /*
+                        Se cambia el .update por el .set principalmente para que
+                        actualice o cree los campos sin borrar los que ya existen,
+                        incluyendo fotoPerfil.
+                         */
                         mapOf(
                             "nombre" to nombre,
                             "apellidos" to apellidos,
@@ -196,10 +234,20 @@ fun ProfileTrabajador(navController: NavController) {
                             "profesion" to profesion,
                             "provincia" to provincia,
                             "bio" to bio
-                        )
+                        ),
+                        SetOptions.merge()
                     ).addOnSuccessListener {
+                        Toast.makeText(context, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show()
                         Log.d("Guardar", "Perfil actualizado")
+                        // Redirigimos a la pantalla principal del trabajador
+                        navController.navigate("cards_trabajador"){
+                            popUpTo("profiletrabajador") { inclusive = true}
+                        }
+                    }.addOnFailureListener {
+                        Toast.makeText(context, "Error al guardar cambios: ${it.message}", Toast.LENGTH_LONG).show()
+                        Log.e("Guardar", "Fallo al actualizar: ${it.message}")
                     }
+
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B396A))

@@ -43,9 +43,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import com.example.connex_jetpack.utils.isEmpresaGlobal
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun RegisterScreen(navController: NavController) {
+    val firebaseUser = FirebaseAuth.getInstance().currentUser
+    val db = FirebaseFirestore.getInstance()
     var selectedOption by remember { mutableStateOf("") }
     var menuExpanded by remember { mutableStateOf(false) }
     val fuenteTextos = FontFamily(Font(R.font.sairastencilone))
@@ -150,13 +155,15 @@ fun RegisterScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(30.dp))
 
             // 🔹 BOTÓN SIGUIENTE
-            Button(
+           /* Button(
                 onClick = {
                     when (selectedOption) {
                         "Empresa/Empleador" -> navController.navigate("registro_empresa")
                         "Trabajador" -> navController.navigate("registro_trabajador")
                     }
                 },
+
+
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -173,6 +180,65 @@ fun RegisterScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            */
+
+            // 🔹 BOTÓN SIGUIENTE ----> FUNCIONALIDAD con FIREBASE
+
+            Button(
+                onClick = {
+                    val firebaseUser = FirebaseAuth.getInstance().currentUser
+                    val db = FirebaseFirestore.getInstance()
+
+                    when (selectedOption) {
+                        "Empresa/Empleador" -> {
+                            firebaseUser?.uid?.let { uid ->
+                                db.collection("empresas").document(uid).set(
+                                    mapOf(
+                                        "nombre" to (firebaseUser.displayName ?: ""),
+                                        "email" to (firebaseUser.email ?: "")
+                                    )
+                                ).addOnSuccessListener {
+                                    isEmpresaGlobal.value = true
+                                    navController.navigate("profileempresa") {
+                                        popUpTo("registro") { inclusive = true }
+                                    }
+                                }
+                            }
+                        }
+
+                        "Trabajador" -> {
+                            firebaseUser?.uid?.let { uid ->
+                                db.collection("trabajadores").document(uid).set(
+                                    mapOf(
+                                        "nombre" to (firebaseUser.displayName ?: ""),
+                                        "email" to (firebaseUser.email ?: "")
+                                    )
+                                ).addOnSuccessListener {
+                                    isEmpresaGlobal.value = false
+                                    navController.navigate("profiletrabajador") {
+                                        popUpTo("registro") { inclusive = true }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                enabled = selectedOption.isNotEmpty(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+            ) {
+                Text(
+                    text = "Siguiente",
+                    fontSize = 18.sp,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+
+
             // 🔹 BOTÓN VOLVER
             Button(
                 onClick = { navController.popBackStack() },
@@ -182,7 +248,10 @@ fun RegisterScreen(navController: NavController) {
                 Text("Volver", fontSize = 18.sp, color = Color.Black)
             }
 
+
             Spacer(modifier = Modifier.height(12.dp))
         }
     }
+
 }
+
