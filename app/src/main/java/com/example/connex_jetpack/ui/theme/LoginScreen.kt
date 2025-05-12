@@ -11,6 +11,9 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,6 +30,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -124,7 +128,7 @@ fun LoginScreen(navController: NavController) {
             )
 
             Spacer(modifier = Modifier.height(12.dp))
-
+/*
             OutlinedTextField(
                 value = passwordManual,
                 onValueChange = { passwordManual = it },
@@ -132,6 +136,38 @@ fun LoginScreen(navController: NavController) {
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 singleLine = true,
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    containerColor = Color.LightGray,
+                    focusedBorderColor = Color.Black,
+                    unfocusedBorderColor = Color.Black,
+                    cursorColor = Color.Black,
+                    focusedLabelColor = Color.Black,
+                    unfocusedLabelColor = Color.Black
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+*/
+
+
+            var passwordManual by remember { mutableStateOf("") }
+            var passwordVisible by remember { mutableStateOf(false) }
+
+            OutlinedTextField(
+                value = passwordManual,
+                onValueChange = { passwordManual = it },
+                label = { Text("Contraseña", color = Color.Black) },
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                singleLine = true,
+                trailingIcon = {
+                    val image = if (passwordVisible)
+                        Icons.Default.Visibility
+                    else Icons.Default.VisibilityOff
+
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(imageVector = image, contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña")
+                    }
+                },
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     containerColor = Color.LightGray,
                     focusedBorderColor = Color.Black,
