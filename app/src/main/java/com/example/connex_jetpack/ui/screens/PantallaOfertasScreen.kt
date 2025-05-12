@@ -20,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.example.connex_jetpack.ui.utils.registrarLike
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -52,7 +53,10 @@ fun PantallaOfertasScreen(navController: NavController) {
                                 .get()
                                 .addOnSuccessListener { ofertas ->
                                     for (oferta in ofertas) {
-                                        val datos = oferta.data
+                                        //val datos = oferta.data
+                                        val datos = oferta.data.toMutableMap()
+                                        datos["id"] = oferta.id // ✅ AÑADIMOS EL ID DE LA OFERTA AQUÍ
+
 
                                         // ✅ Aplica los filtros:
                                         val coincide = filtros?.let {
@@ -127,7 +131,18 @@ fun PantallaOfertasScreen(navController: NavController) {
                         puesto = it["puesto"] as? String ?: "Sin título",
                         distanciaKm = "3.2 km", // Temporal
                         onVerMas = {},
-                        onLike = {},
+                        onLike =  {
+                            val idTrabajador = FirebaseAuth.getInstance().currentUser?.uid ?: return@OfertaCard
+                            val idOferta = it["id"] as? String ?: return@OfertaCard
+                            registrarLike(
+                                db = FirebaseFirestore.getInstance(),
+                                idOferta = idOferta,
+                                idUsuario = idTrabajador,
+                                tipoUsuario = "trabajador",
+                                onMatch = {
+                                    navController.navigate("match_screen") //
+                                }
+                            )},
                         onNope = {},
                         onSuperLike = {}
                     )

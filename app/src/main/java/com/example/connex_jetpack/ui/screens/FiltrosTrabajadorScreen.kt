@@ -31,8 +31,9 @@ fun FiltrosTrabajadorScreen(navController: NavController) {
     var distanciaKm by remember { mutableStateOf(10f) }
     var salarioMin by remember { mutableStateOf(1000f) }
 
-    Scaffold(
+   Scaffold(
         bottomBar = { BottomBar(navController = navController, isEmpresa = false) }
+
     ) { innerPadding ->
         Column(
             modifier = Modifier

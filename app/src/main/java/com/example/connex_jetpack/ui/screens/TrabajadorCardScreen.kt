@@ -18,15 +18,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.connex_jetpack.R
+
 import com.example.connex_jetpack.ui.components.BottomBar
 import com.example.connex_jetpack.ui.components.OfertaCard
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun TrabajadorCardScreen(navController: NavController) {
+
+
     Scaffold(
+
         bottomBar = {
             BottomBar(navController = navController, isEmpresa = true)
         }
+
+
     ) { innerPadding ->
         Box(
             modifier = Modifier
