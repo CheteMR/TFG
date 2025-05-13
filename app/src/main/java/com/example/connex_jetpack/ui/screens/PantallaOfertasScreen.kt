@@ -18,6 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.example.connex_jetpack.ui.components.SwipeOfertaCards
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -114,14 +115,20 @@ fun PantallaOfertasScreen(navController: NavController) {
             } else {
                 val oferta = listaOfertasFiltradas.firstOrNull()
                 oferta?.let {
-                    OfertaCard(
-                        imagenEmpresa = R.drawable.logo_barpin,
-                        puesto = it["puesto"] as? String ?: "Sin título",
-                        distanciaKm = "3.2 km", // Temporal
-                        onVerMas = {},
-                        onLike = {},
-                        onNope = {},
-                        onSuperLike = {}
+                    SwipeOfertaCards(
+                        listaOfertas = listaOfertasFiltradas,
+                        onLike = { oferta ->
+                            // TODO: Guardar like en Firebase
+                        },
+                        onNope = { oferta ->
+                            // TODO: Guardar dislike
+                        },
+                        onSuperLike = { oferta ->
+                            // TODO: Guardar superlike
+                        },
+                        onVerMas = { oferta ->
+                            // TODO: Navegar a pantalla con más información
+                        }
                     )
                 }
             }

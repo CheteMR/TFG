@@ -23,56 +23,56 @@ import com.example.connex_jetpack.R
 import kotlinx.coroutines.launch
 
                 //CARD DONDE SE VE LA OFERTA DE LA EMPRESA (SOLO DEBEN VERLA LOS TRABAJADORES)
-                @Composable
-                fun OfertaCard(
-                    imagenEmpresa: Int,
-                    puesto: String,
-                    distanciaKm: String,
-                    onVerMas: () -> Unit,
-                    onLike: () -> Unit,
-                    onNope: () -> Unit,
-                    onSuperLike: () -> Unit
-                ) {
-                    val likeScale = remember { Animatable(1f) }
-                    val nopeScale = remember { Animatable(1f) }
-                    val superLikeScale = remember { Animatable(1f) }
-                    val cardOffsetX = remember { Animatable(0f) }
-                    val scope = rememberCoroutineScope()
+@Composable
+fun OfertaCard(
+    imagenEmpresa: Int,
+    puesto: String,
+    distanciaKm: String,
+    onVerMas: () -> Unit,
+    onLike: () -> Unit,
+    onNope: () -> Unit,
+    onSuperLike: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val likeScale = remember { Animatable(1f) }
+    val nopeScale = remember { Animatable(1f) }
+    val superLikeScale = remember { Animatable(1f) }
+    val cardOffsetX = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
 
-                    var triggerLike by remember { mutableStateOf(false) }
-                    var triggerNope by remember { mutableStateOf(false) }
-                    var triggerSuperLike by remember { mutableStateOf(false) }
+    var triggerLike by remember { mutableStateOf(false) }
+    var triggerNope by remember { mutableStateOf(false) }
+    var triggerSuperLike by remember { mutableStateOf(false) }
 
-                    // Animaciones
-                    LaunchedEffect(triggerLike) {
-                        if (triggerLike) {
-                            likeScale.animateTo(1.2f, tween(120))
-                            likeScale.animateTo(1f, tween(100))
-                            triggerLike = false
-                        }
-                    }
-                    LaunchedEffect(triggerNope) {
-                        if (triggerNope) {
-                            nopeScale.animateTo(1.2f, tween(100))
-                            nopeScale.animateTo(1f, tween(100))
-                            triggerNope = false
-                        }
-                    }
-                    LaunchedEffect(triggerSuperLike) {
-                        if (triggerSuperLike) {
-                            superLikeScale.animateTo(1.4f, tween(80))
-                            superLikeScale.animateTo(1f, tween(120))
-                            triggerSuperLike = false
-                        }
-                    }
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color(0xFF4E8ADB))
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.SpaceBetween,
-                        horizontalAlignment = Alignment.CenterHorizontally
+    // Animaciones
+    LaunchedEffect(triggerLike) {
+       if (triggerLike) {
+           likeScale.animateTo(1.2f, tween(120))
+           likeScale.animateTo(1f, tween(100))
+           triggerLike = false
+           }
+       }
+       LaunchedEffect(triggerNope) {
+            if (triggerNope) {
+                nopeScale.animateTo(1.2f, tween(100))
+                nopeScale.animateTo(1f, tween(100))
+                triggerNope = false
+                }
+            }
+            LaunchedEffect(triggerSuperLike) {
+                 if (triggerSuperLike) {
+                 superLikeScale.animateTo(1.4f, tween(80))
+                 superLikeScale.animateTo(1f, tween(120))
+                 triggerSuperLike = false
+                 }
+            }
+            Column(
+                   modifier = Modifier
+                   .fillMaxSize()
+                   .background(Color(0xFF4E8ADB))
+                   .padding(16.dp),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         BoxWithConstraints(
                             modifier = Modifier
