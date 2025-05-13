@@ -29,7 +29,7 @@ fun NavGraph(navController: NavHostController) {
         composable("registro_empresa") { RegisterEmpresaScreen(navController) }
         composable("profiletrabajador") { ProfileTrabajador(navController) }
         composable("profileempresa") { ProfileEmpresa(navController) }
-        composable("cards_trabajador") { PantallaOfertasScreen(navController) }
+        composable("cards_trabajador") { SwipeOfertasScreen(navController) }
         composable("cards_empresa") { TrabajadorCardScreen(navController) }
         composable("crear_oferta") { CrearOferta(navController) }
         composable("oferta_publicada") { OfertaPublicadaScreen(navController) }

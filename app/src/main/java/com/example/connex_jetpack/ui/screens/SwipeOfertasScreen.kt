@@ -2,8 +2,6 @@ package com.example.connex_jetpack.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -20,74 +18,59 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import com.example.connex_jetpack.ui.utils.registrarLike
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 
 //PANTALLA DONDE SALEN LAS CARDS QUE VE EL TRABAJADOR
 @Composable
-fun PantallaOfertasScreen(navController: NavController) {
+fun SwipeOfertasScreen(navController: NavController) {
     val db = FirebaseFirestore.getInstance()
     val uid = FirebaseAuth.getInstance().currentUser?.uid
-    val listaOfertasFiltradas = remember { mutableStateListOf<Map<String, Any>>() }
+    val listaOfertas = remember { mutableStateListOf<Map<String, Any>>() }
     val filtrosUsuario = remember { mutableStateOf<Map<String, Any>?>(null) }
-    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-
-
+    var currentIndex by remember { mutableStateOf(0) }
 
     LaunchedEffect(uid) {
         uid?.let {
-            // 🔹 Primero obtenemos los filtros del trabajador
             db.collection("trabajadores").document(it).get()
                 .addOnSuccessListener { doc ->
                     val filtros = doc.get("filtros") as? Map<String, Any>
                     filtrosUsuario.value = filtros
 
-                    // 🔹 Luego traemos todas las ofertas de todas las empresas
                     db.collection("empresas").get().addOnSuccessListener { empresas ->
-                        listaOfertasFiltradas.clear()
+                        listaOfertas.clear()
                         for (empresaDoc in empresas) {
                             val empresaId = empresaDoc.id
                             db.collection("empresas").document(empresaId).collection("ofertas")
                                 .get()
                                 .addOnSuccessListener { ofertas ->
                                     for (oferta in ofertas) {
-                                        //val datos = oferta.data
                                         val datos = oferta.data.toMutableMap()
-                                        datos["id"] = oferta.id // ✅ AÑADIMOS EL ID DE LA OFERTA AQUÍ
+                                        datos["id"] = oferta.id
 
-
-                                        // ✅ Aplica los filtros:
                                         val coincide = filtros?.let {
-                                            val sectorOk =
-                                                it["sector"] == "" || it["sector"] == datos["sector"]
-                                            val contratoOk =
-                                                it["contrato"] == "" || it["contrato"] == datos["tipoContrato"]
-                                            val modalidadOk =
-                                                it["modalidad"] == "" || it["modalidad"] == datos["modalidad"]
-                                            val provinciaOk =
-                                                it["provincia"] == "" || it["provincia"] == datos["provincia"]
-
-                                            val salarioFiltro =
-                                                (it["salario"] as? Long)?.toInt() ?: 0
-                                            val salarioOferta =
-                                                when (val valor = datos["salario"]) {
-                                                    is String -> valor.toIntOrNull()
-                                                    is Long -> valor.toInt()
-                                                    is Int -> valor
-                                                    else -> null
-                                                }
-
-                                            val salarioOk =
-                                                salarioOferta?.let { s -> s >= salarioFiltro }
-                                                    ?: true
-
+                                            val sectorOk = it["sector"] == "" || it["sector"] == datos["sector"]
+                                            val contratoOk = it["contrato"] == "" || it["contrato"] == datos["tipoContrato"]
+                                            val modalidadOk = it["modalidad"] == "" || it["modalidad"] == datos["modalidad"]
+                                            val provinciaOk = it["provincia"] == "" || it["provincia"] == datos["provincia"]
+                                            val salarioFiltro = (it["salario"] as? Long)?.toInt() ?: 0
+                                            val salarioOferta = when (val valor = datos["salario"]) {
+                                                is String -> valor.toIntOrNull()
+                                                is Long -> valor.toInt()
+                                                is Int -> valor
+                                                else -> null
+                                            }
+                                            val salarioOk = salarioOferta?.let { s -> s >= salarioFiltro } ?: true
                                             sectorOk && contratoOk && modalidadOk && provinciaOk && salarioOk
                                         } ?: true
 
                                         if (coincide) {
-                                            listaOfertasFiltradas.add(datos)
+                                            listaOfertas.add(datos)
                                         }
                                     }
                                 }
@@ -97,8 +80,6 @@ fun PantallaOfertasScreen(navController: NavController) {
         }
     }
 
-
-
     Scaffold(
         bottomBar = { BottomBar(navController = navController, isEmpresa = false) }
     ) { innerPadding ->
@@ -107,50 +88,60 @@ fun PantallaOfertasScreen(navController: NavController) {
                 .fillMaxSize()
                 .background(Color(0xFF4E8ADB))
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
         ) {
-
-            if (listaOfertasFiltradas.isEmpty()) {
+            if (listaOfertas.isEmpty()) {
                 if (filtrosUsuario.value != null) {
-                    // Ya cargó pero no hay ofertas que cumplan los filtros
                     Text(
-                        text = "No se han encontrado ofertas que coincidan con tus filtros.",
+                        text = "No hay ofertas que coincidan con tus filtros.",
                         color = Color.White,
-                        modifier = Modifier.fillMaxWidth(),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 } else {
-                    // Aún está cargando
                     CircularProgressIndicator(color = Color.White)
                 }
             } else {
-                val oferta = listaOfertasFiltradas.firstOrNull()
-                oferta?.let {
+                if (currentIndex < listaOfertas.size) {
+                    val oferta = listaOfertas[currentIndex]
                     OfertaCard(
-                        imagenEmpresa = R.drawable.logo_barpin,
-                        puesto = it["puesto"] as? String ?: "Sin título",
-                        distanciaKm = "3.2 km", // Temporal
+                        imagenEmpresa = R.drawable.logo_barpin, // puedes cambiar esto según cada empresa si lo tienes
+                        puesto = oferta["puesto"] as? String ?: "Sin título",
+                        distanciaKm = "3.2 km",
                         onVerMas = {},
-                        onLike =  {
+                        onLike = {
                             val idTrabajador = FirebaseAuth.getInstance().currentUser?.uid ?: return@OfertaCard
-                            val idOferta = it["id"] as? String ?: return@OfertaCard
+                            val idOferta = oferta["id"] as? String ?: return@OfertaCard
                             registrarLike(
-                                db = FirebaseFirestore.getInstance(),
+                                db = db,
                                 idOferta = idOferta,
                                 idUsuario = idTrabajador,
                                 tipoUsuario = "trabajador",
                                 onMatch = {
-                                    navController.navigate("match_screen") //
+                                    navController.navigate("match_screen")
                                 }
-                            )},
-                        onNope = {},
-                        onSuperLike = {}
+                            )
+                            currentIndex++
+                        },
+                        onNope = {
+                            currentIndex++
+                        },
+                        onSuperLike = {
+                            currentIndex++
+                        }
+                    )
+                } else {
+                    Text(
+                        text = "Has visto todas las ofertas disponibles.",
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
             }
         }
     }
 }
+
 
 
 

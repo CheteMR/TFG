@@ -36,13 +36,12 @@ fun ProfileEmpresa(navController: NavController) {
     var nombreEmpresa by remember { mutableStateOf<String?>(null) }
     var sector by remember { mutableStateOf<String?>("Tecnología") }
     var descripcion by remember { mutableStateOf<String?>("Empresa líder en innovación.") }
-    var provincia by remember { mutableStateOf<String?> ("")}
+    var provincia by remember { mutableStateOf<String?>("") }
     val listaOfertas = remember { mutableStateListOf<Map<String, Any>>() }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    // 🔁 Cargar datos
     LaunchedEffect(uid) {
         uid?.let {
             db.collection("empresas").document(it).get().addOnSuccessListener { doc ->
@@ -50,6 +49,7 @@ fun ProfileEmpresa(navController: NavController) {
                     nombreEmpresa = doc.getString("nombre")
                     sector = doc.getString("sector")
                     descripcion = doc.getString("descripcion")
+                    provincia = doc.getString("provincia")
                 }
             }
 
@@ -66,21 +66,13 @@ fun ProfileEmpresa(navController: NavController) {
     }
 
     Scaffold(
-        //bottomBar = {
-           // BottomBar(navController = navController, isEmpresa = true)
-        //},
-
-        //En el perfil se le pone un botón para cerrar sesión
         topBar = {
             TopAppBar(
                 title = { Text("Perfil Empresa") },
                 actions = {
                     IconButton(onClick = {
-                        // 1) Firebase sign out
                         auth.signOut()
-                        // 2) Google sign out
                         googleAuthUiClient.signOut()
-                        // 3) Volver al login y limpiar backstack
                         navController.navigate("login") {
                             popUpTo("login") { inclusive = true }
                         }
@@ -90,18 +82,17 @@ fun ProfileEmpresa(navController: NavController) {
                 }
             )
         },
-
-
+        bottomBar = {
+            BottomBar(navController = navController, isEmpresa = true)
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         if (nombreEmpresa == null) {
-            // Animación de carga
             val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation))
             val progress by animateLottieCompositionAsState(
                 composition,
                 iterations = LottieConstants.IterateForever
             )
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -131,24 +122,14 @@ fun ProfileEmpresa(navController: NavController) {
                         elevation = CardDefaults.cardElevation(4.dp)
                     ) {
                         Column(Modifier.padding(16.dp)) {
-                            Text(
-                                "👔 Nombre: $nombreEmpresa",
-                                style = MaterialTheme.typography.bodyLarge
-                            )
+                            Text("👔 Nombre: $nombreEmpresa", style = MaterialTheme.typography.bodyLarge)
                             Text("🏢 Sector: $sector", style = MaterialTheme.typography.bodyLarge)
-                            Text(
-                                "📝 Descripción: $descripcion",
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                            Text(
-                                "📝 Descripción: $provincia",
-                                style = MaterialTheme.typography.bodyLarge
-                            )
+                            Text("🌍 Provincia: $provincia", style = MaterialTheme.typography.bodyLarge)
+                            Text("📝 Descripción: $descripcion", style = MaterialTheme.typography.bodyLarge)
                         }
                     }
                 }
 
-                // 👉 Ofertas publicadas
                 item {
                     Divider()
                     Text(
@@ -163,7 +144,7 @@ fun ProfileEmpresa(navController: NavController) {
                     val oferta = listaOfertas[index]
                     val puesto = oferta["puesto"] as? String ?: "Sin título"
                     val modalidad = oferta["modalidad"] as? String ?: ""
-                    val salario = oferta["salario"] as? String ?: "No especificado"
+                    val salario = oferta["salario"]?.toString() ?: "No especificado"
                     val docId = oferta["id"] as? String
 
                     Card(
@@ -215,11 +196,7 @@ fun ProfileEmpresa(navController: NavController) {
                                         }
                                 }
                             }) {
-                                Icon(
-                                    Icons.Default.Delete,
-                                    contentDescription = "Eliminar",
-                                    tint = Color.Red
-                                )
+                                Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = Color.Red)
                             }
                         }
                     }
