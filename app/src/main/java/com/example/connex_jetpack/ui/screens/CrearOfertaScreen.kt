@@ -134,6 +134,7 @@ fun CrearOferta(navController: NavController) {
                     val salarioFinal = salarioSlider.toInt().toString()
 
                     val nuevaOferta = hashMapOf(
+                        "empresaId" to uid, // 👈 Añadir este campo
                         "puesto" to puesto,
                         "sector" to sectorSeleccionado,
                         "modalidad" to modalidadSeleccionada,

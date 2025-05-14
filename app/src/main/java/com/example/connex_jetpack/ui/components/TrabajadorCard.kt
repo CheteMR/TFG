@@ -15,11 +15,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.connex_jetpack.R
+import coil.compose.rememberAsyncImagePainter
 
 //CARD DONDE SE VE AL TRABAJADOR (SOLO DEBE VERLAS LAS EMPRESAS)
 @Composable
 fun TrabajadorCard(
-    fotoTrabajador: Int,
+    fotoUrl: String?,
     profesion: String,
     distanciaKm: String,
     onVerMas: () -> Unit,
@@ -37,7 +38,7 @@ fun TrabajadorCard(
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f) // ocupa espacio disponible sin desbordar
+                .weight(1f)
         ) {
             val maxCardHeight = maxHeight * 0.9f
 
@@ -56,12 +57,19 @@ fun TrabajadorCard(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
+                    // 🔁 Imagen con Coil (cargar URL o imagen local si no hay URL)
+                    val painter = if (!fotoUrl.isNullOrEmpty()) {
+                        rememberAsyncImagePainter(fotoUrl)
+                    } else {
+                        painterResource(id = R.drawable.avatar) // asegúrate de tener esta imagen en drawable
+                    }
+
                     Image(
-                        painter = painterResource(id = fotoTrabajador),
+                        painter = painter,
                         contentDescription = "Foto del trabajador",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .aspectRatio(1.5f) // más flexible que height fija
+                            .aspectRatio(1.5f)
                             .clip(RoundedCornerShape(16.dp))
                     )
 
@@ -105,6 +113,7 @@ fun TrabajadorCard(
                             onClick = onLike,
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF81C784)),
                             shape = RoundedCornerShape(12.dp)
+
                         ) {
                             Text("Like", color = Color.White)
                         }

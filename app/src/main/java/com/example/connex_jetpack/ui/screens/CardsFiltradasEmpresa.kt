@@ -1,145 +1,25 @@
 package com.example.connex_jetpack.ui.screens
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.connex_jetpack.ui.components.BottomBar
-import com.example.connex_jetpack.ui.utils.registrarLike
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-/*
-@Composable
-fun CardsFiltradasEmpresa(navController: NavController, idOferta: String) {
-    val uidEmpresa = FirebaseAuth.getInstance().currentUser?.uid ?: return
-    val db = FirebaseFirestore.getInstance()
-    val candidatos = remember { mutableStateListOf<Map<String, Any>>() }
-    var isLoading by remember { mutableStateOf(true) }
-
-    // 🔍 Cargar filtros de la oferta y buscar candidatos que los cumplan
-    LaunchedEffect(idOferta) {
-        db.collection("empresas").document(uidEmpresa)
-            .collection("ofertas").document(idOferta)
-            .get()
-            .addOnSuccessListener { doc ->
-                val filtros = doc.data ?: return@addOnSuccessListener
-                val sector = filtros["sector"] as? String
-                val modalidad = filtros["modalidad"] as? String
-                val contrato = filtros["tipoContrato"] as? String
-                val provincia = filtros["provincia"] as? String
-                val salario = (filtros["salario"] as? String)?.toIntOrNull()
-
-                db.collection("trabajadores").get()
-                    .addOnSuccessListener { result ->
-                        candidatos.clear()
-                        for (trabajador in result) {
-                            val trab = trabajador.data
-                            if (
-                                (sector == null || trab["sector"] == sector) &&
-                                (modalidad == null || trab["modalidad"] == modalidad) &&
-                                (contrato == null || trab["contrato"] == contrato) &&
-                                (provincia == null || trab["provincia"] == provincia) &&
-                                (salario == null || (trab["salario"] as? Long ?: 0) <= salario)
-                            ) {
-                                candidatos.add(trab)
-                            }
-                        }
-
-                    }
-            }
-    }
-
-    Scaffold(
-        bottomBar = { BottomBar(navController = navController, isEmpresa = true) }
-    ) { innerPadding ->
-        if (isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-            }
-        } else {
-            if (candidatos.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No hay más candidatos que cumplan con los filtros seleccionados.")
-                }
-            } else {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                        .padding(16.dp)
-                ) {
-                    candidatos.forEach { cand ->
-                        val nombre = cand["nombre"] as? String ?: "Sin nombre"
-                        val sector = cand["sector"] as? String ?: "Sector desconocido"
-                        val provincia = cand["provincia"] as? String ?: "Ubicación desconocida"
-                        val idCandidato = cand["uid"] as? String ?: return@forEach
-
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 12.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color.White)
-                        ) {
-                            Column(Modifier.padding(16.dp)) {
-                                Text("👤 $nombre", style = MaterialTheme.typography.titleMedium)
-                                Text("📍 $provincia")
-                                Text("🔧 Sector: $sector")
-
-                                Button(
-                                    onClick = {
-                                        registrarLike(
-                                            db = db,
-                                            idOferta = idOferta,
-                                            idUsuario = idCandidato,
-                                            tipoUsuario = "empresa",
-                                            onMatch = {
-                                                navController.navigate("match_screen") // 👈 Asegúrate de tener esta ruta
-                                            },
-                                            onLikeRegistrado = {
-                                                // Puedes mostrar un Toast si quieres
-                                            }
-                                        )
-                                    },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(
-                                            0xFF1B396A
-                                        )
-                                    )
-                                ) {
-                                    Text("💙 Me interesa", color = Color.White)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-*/
-import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
+import com.example.connex_jetpack.R
+import com.example.connex_jetpack.ui.components.BottomBar
+import com.example.connex_jetpack.ui.utils.registrarLike
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -175,10 +55,10 @@ fun CardsFiltradasEmpresa(navController: NavController, idOferta: String) {
                         if (filtrosTrabajador != null) {
                             val coincide =
                                 (sector.value == null || filtrosTrabajador["sector"] == sector.value) &&
-                                (modalidad.value == null || filtrosTrabajador["modalidad"] == modalidad.value) &&
-                                (contrato.value == null || filtrosTrabajador["contrato"] == contrato.value) &&
-                                (provincia.value == null || filtrosTrabajador["provincia"] == provincia.value) &&
-                                (salario.value == null || (filtrosTrabajador["salario"] as? Long ?: 0) <= salario.value!!)
+                                        (modalidad.value == null || filtrosTrabajador["modalidad"] == modalidad.value) &&
+                                        (contrato.value == null || filtrosTrabajador["contrato"] == contrato.value) &&
+                                        (provincia.value == null || filtrosTrabajador["provincia"] == provincia.value) &&
+                                        (salario.value == null || (filtrosTrabajador["salario"] as? Long ?: 0) <= salario.value!!)
 
                             if (coincide) {
                                 filtrados.add(trab)
@@ -194,7 +74,8 @@ fun CardsFiltradasEmpresa(navController: NavController, idOferta: String) {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Candidatos filtrados") })
-        }
+        },
+        bottomBar = { BottomBar(navController = navController, isEmpresa = true) }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -211,42 +92,74 @@ fun CardsFiltradasEmpresa(navController: NavController, idOferta: String) {
             } else {
                 candidatos.forEach { cand ->
                     val nombre = cand["nombre"] as? String ?: "Sin nombre"
-                    val sector = cand["sector"] as? String ?: "Sector desconocido"
-                    val provincia = cand["provincia"] as? String ?: "Ubicación desconocida"
+                    val sectorText = cand["sector"] as? String ?: "Sector desconocido"
+                    val provinciaText = cand["provincia"] as? String ?: "Ubicación desconocida"
                     val idCandidato = cand["uid"] as? String ?: return@forEach
+                    val fotoPerfilUrl = cand["fotoPerfil"] as? String
 
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 12.dp),
+                            .padding(bottom = 16.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.White)
                     ) {
-                        Column(Modifier.padding(16.dp)) {
-                            Text("👤 $nombre", style = MaterialTheme.typography.titleMedium)
-                            Text("📍 $provincia")
-                            Text("🔧 Sector: $sector")
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            val painter = if (!fotoPerfilUrl.isNullOrEmpty()) {
+                                rememberAsyncImagePainter(fotoPerfilUrl)
+                            } else {
+                                painterResource(id = R.drawable.avatar)
+                            }
+
+                            Image(
+                                painter = painter,
+                                contentDescription = "Foto del trabajador",
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(MaterialTheme.shapes.medium)
+                            )
 
                             Spacer(modifier = Modifier.height(8.dp))
 
-                            Button(
-                                onClick = {
-                                    registrarLike(
-                                        db = db,
-                                        idOferta = idOferta,
-                                        idUsuario = idCandidato,
-                                        tipoUsuario = "empresa",
-                                        onMatch = {
-                                            navController.navigate("pantalla_match")
-                                        },
-                                        onLikeRegistrado = {
+                            Text(nombre, style = MaterialTheme.typography.titleMedium)
+                            Text("📍 $provinciaText")
+                            Text("🔧 $sectorText")
 
-                                        }
-                                    )
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B396A))
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
-                                Text("💙 Me interesa", color = Color.White)
-                                //Añadir un botón de No me interesa
+                                Button(
+                                    onClick = {
+                                        registrarLike(
+                                            db = db,
+                                            idOferta = idOferta,
+                                            idUsuarioQueDaLike = uidEmpresa,
+                                            idUsuarioObjetivo = idCandidato,
+                                            tipoUsuario = "empresa",
+                                            onMatch = {
+                                                navController.navigate("pantalla_match/$idOferta/$idCandidato/$uidEmpresa")
+                                            },
+                                            onLikeRegistrado = {}
+                                        )
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF81C784))
+                                ) {
+                                    Text("Like", color = Color.White)
+                                }
+
+                                Button(
+                                    onClick = {
+                                        // Acción de 'Nope' opcional
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE57373))
+                                ) {
+                                    Text("Nope", color = Color.White)
+                                }
                             }
                         }
                     }
@@ -255,3 +168,4 @@ fun CardsFiltradasEmpresa(navController: NavController, idOferta: String) {
         }
     }
 }
+

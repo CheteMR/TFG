@@ -30,13 +30,13 @@ import androidx.compose.runtime.setValue
 @Composable
 fun SwipeOfertasScreen(navController: NavController) {
     val db = FirebaseFirestore.getInstance()
-    val uid = FirebaseAuth.getInstance().currentUser?.uid
+    val uidTrabajador = FirebaseAuth.getInstance().currentUser?.uid
     val listaOfertas = remember { mutableStateListOf<Map<String, Any>>() }
     val filtrosUsuario = remember { mutableStateOf<Map<String, Any>?>(null) }
     var currentIndex by remember { mutableStateOf(0) }
 
-    LaunchedEffect(uid) {
-        uid?.let {
+    LaunchedEffect(uidTrabajador) {
+        uidTrabajador?.let {
             db.collection("trabajadores").document(it).get()
                 .addOnSuccessListener { doc ->
                     val filtros = doc.get("filtros") as? Map<String, Any>
@@ -52,6 +52,7 @@ fun SwipeOfertasScreen(navController: NavController) {
                                     for (oferta in ofertas) {
                                         val datos = oferta.data.toMutableMap()
                                         datos["id"] = oferta.id
+                                        datos["empresaId"] = empresaId // 👈 AÑADIDO para saber quién publica
 
                                         val coincide = filtros?.let {
                                             val sectorOk = it["sector"] == "" || it["sector"] == datos["sector"]
@@ -104,31 +105,30 @@ fun SwipeOfertasScreen(navController: NavController) {
             } else {
                 if (currentIndex < listaOfertas.size) {
                     val oferta = listaOfertas[currentIndex]
+                    val empresaId = oferta["empresaId"] as? String ?: ""
+                    val idOferta = oferta["id"] as? String ?: ""
+
                     OfertaCard(
-                        imagenEmpresa = R.drawable.logo_barpin, // puedes cambiar esto según cada empresa si lo tienes
+                        imagenEmpresa = R.drawable.logo_barpin,
                         puesto = oferta["puesto"] as? String ?: "Sin título",
                         distanciaKm = "3.2 km",
                         onVerMas = {},
                         onLike = {
-                            val idTrabajador = FirebaseAuth.getInstance().currentUser?.uid ?: return@OfertaCard
-                            val idOferta = oferta["id"] as? String ?: return@OfertaCard
+                            val idTrabajador = uidTrabajador ?: return@OfertaCard
                             registrarLike(
                                 db = db,
                                 idOferta = idOferta,
-                                idUsuario = idTrabajador,
+                                idUsuarioQueDaLike = idTrabajador,
+                                idUsuarioObjetivo = empresaId,
                                 tipoUsuario = "trabajador",
                                 onMatch = {
-                                    navController.navigate("match_screen")
+                                    navController.navigate("pantalla_match/$idTrabajador/$empresaId")
                                 }
                             )
                             currentIndex++
                         },
-                        onNope = {
-                            currentIndex++
-                        },
-                        onSuperLike = {
-                            currentIndex++
-                        }
+                        onNope = { currentIndex++ },
+                        onSuperLike = { currentIndex++ }
                     )
                 } else {
                     Text(
@@ -141,6 +141,7 @@ fun SwipeOfertasScreen(navController: NavController) {
         }
     }
 }
+
 
 
 

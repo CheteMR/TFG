@@ -1,15 +1,12 @@
 package com.example.connex_jetpack.ui.theme
 
 import android.app.Activity
-import android.provider.Settings.Global.getString
-import android.provider.Settings.Secure.getString
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -17,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
@@ -38,16 +34,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat.getString
-import androidx.core.content.res.TypedArrayUtils.getString
 import androidx.navigation.NavController
 import com.example.connex_jetpack.R
 import com.example.connex_jetpack.auth.GoogleAuthUiClient
 import com.example.connex_jetpack.utils.isEmpresaGlobal
 import com.google.android.gms.auth.api.identity.Identity
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -82,7 +73,7 @@ fun LoginScreen(navController: NavController) {
                                         .addOnSuccessListener { docEmpresa ->
                                             if (docEmpresa.exists()) {
                                                 isEmpresaGlobal.value = true
-                                                navController.navigate("cards_empresa") {
+                                                navController.navigate("profileempresa") {
                                                     popUpTo("login") { inclusive = true }
                                                 }
                                             } else {
@@ -246,7 +237,9 @@ fun LoginScreen(navController: NavController) {
                                                 .addOnSuccessListener { docEmpresa ->
                                                     if (docEmpresa.exists()) {
                                                         isEmpresaGlobal.value = true
-                                                        navController.navigate("cards_empresa")
+                                                        navController.navigate("profileempresa") {
+                                                            popUpTo("login") { inclusive = true }
+                                                        }
                                                     } else {
                                                         Toast.makeText(context, "Tipo de usuario no encontrado", Toast.LENGTH_SHORT).show()
                                                     }

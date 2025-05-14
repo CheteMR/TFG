@@ -1,7 +1,9 @@
 package com.example.connex_jetpack.ui.components
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Tune
@@ -11,6 +13,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.compose.material3.Text
 import com.example.connex_jetpack.utils.isEmpresaGlobal
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 @Composable
@@ -22,8 +26,25 @@ fun BottomBar(navController: NavController, isEmpresa: Boolean = isEmpresaGlobal
             label = { Text("Inicio") },
             selected = false,
             onClick = {
-                if (isEmpresa) navController.navigate("cards_empresa")
-                else navController.navigate("cards_trabajador")
+                if (isEmpresa) {
+                    val empresaId = FirebaseAuth.getInstance().currentUser?.uid ?: return@NavigationBarItem
+                    val db = FirebaseFirestore.getInstance()
+                    db.collection("empresas").document(empresaId)
+                        .collection("ofertas")
+                        .limit(1)
+                        .get()
+                        .addOnSuccessListener { snapshot ->
+                            val oferta = snapshot.documents.firstOrNull()
+                            if (oferta != null) {
+                                val ofertaId = oferta.id
+                                navController.navigate("cards_empresa/$ofertaId/$empresaId")
+                            } else {
+                                navController.navigate("profileempresa")
+                            }
+                        }
+                } else {
+                    navController.navigate("cards_trabajador")
+                }
             }
         )
 
@@ -48,6 +69,14 @@ fun BottomBar(navController: NavController, isEmpresa: Boolean = isEmpresaGlobal
                 if (isEmpresa) navController.navigate("filtros_empresa")
                 else navController.navigate("filtros_trabajador")
             }
+        )
+
+        // 🔹 CHATS
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.Chat, contentDescription = "Chats") },
+            label = { Text("Chats") },
+            selected = false,
+            onClick = { navController.navigate("chats_list") }
         )
 
         // 🔹 PERFIL
